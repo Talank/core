@@ -268,9 +268,9 @@ Feature: Sharing files and folders with internal users
       | user1    |
       | user2    |
     And user "user0" has uploaded file with content "uploaded content" to "lorem.txt"
-    And user "user0" has shared folder "/lorem.txt" with user "user1"
-    And user "user1" has shared folder "/lorem.txt" with user "user2"
-    And user "user1" has created a public link share of file "/lorem.txt"
+    And user "user0" has shared file "lorem.txt" with user "user1"
+    And user "user1" has shared file "lorem.txt" with user "user2"
+    And user "user1" has created a public link share of file "lorem.txt"
     And user "user0" has logged in using the webUI
     When the user opens the share dialog for file "lorem.txt"
     And the user opens the public link share tab
