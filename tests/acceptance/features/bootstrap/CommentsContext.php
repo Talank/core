@@ -139,6 +139,7 @@ class CommentsContext implements Context {
 	public function checkComments($user, $path, $expectedElements) {
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		$commentsPath = "/comments/files/$fileId/";
+		// limiting number of results and start from first (offset)
 		$properties = '<oc:limit>200</oc:limit><oc:offset>0</oc:offset>';
 		$elementList = $this->reportElementComments(
 			$user, $commentsPath, $properties
@@ -424,6 +425,46 @@ class CommentsContext implements Context {
 			$body, $this->featureContext->getDavPathVersion(), "comments"
 		);
 		return HttpRequestHelper::getResponseXml($response);
+	}
+
+	/**
+	 * @When the user gets all information of comments of folder :arg1 using the WebDAV API
+	 *
+	 * @param string $path
+	 *
+	 * @return void
+	 */
+	public function theUserGetsAllInfoOfCommentsOfFolderUsingTheWebdavApi($path) {
+		$user = $this->featureContext->getCurrentUser();
+		$fileId = $this->featureContext->getFileIdForPath($user, $path);
+		$commentsPath = "/comments/files/$fileId/";
+		$this->featureContext->setResponseXmlObject(
+			$this->reportElementComments(
+				$user,
+				$commentsPath,
+				'<oc:limit>200</oc:limit><oc:offset>0</oc:offset>'
+			)
+		);
+	}
+
+	/**
+	 * @Then following comment properties should be listed
+	 *
+	 * @param TableNode $expectedProperties
+	 *
+	 * @return void
+	 */
+	public function followingPropertiesShouldBeListed($expectedProperties) {
+		$responseXmlObject = $this->featureContext->getResponseXmlObject();
+		foreach ($expectedProperties->getColumnsHash() as $row) {
+			$xmlPart = $responseXmlObject->xpath(
+				"//d:prop/oc:" . $row["property"]
+			);
+			Assert::assertEquals(
+				$xmlPart[0],
+				$row["value"]
+			);
+		}
 	}
 
 	/**
